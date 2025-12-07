@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Portfolio — Collapsible Charter (Merged)</title>
+<style>
+  :root {
+    --bg-dark: #0a0e27;
+    --bg-mid: #141a39;
+    --bg-card: #1e2749;
+    --accent-primary: #6366f1;
+    --accent-secondary: #8b5cf6;
+    --accent-success: #10b981;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border: rgba(148, 163, 184, 0.12);
+    --shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: radial-gradient(1200px 900px at 10% 0%, rgba(99,102,241,0.12), transparent 45%), 
+                radial-gradient(1000px 800px at 90% 100%, rgba(139,92,246,0.12), transparent 45%),
+                linear-gradient(135deg, var(--bg-dark), var(--bg-mid));
+    color: var(--text-primary); line-height: 1.6;
+  }
+  .top-nav {
+    position: sticky; top: 0; z-index: 1000;
+    display: flex; justify-content: center; padding: 10px;
+    backdrop-filter: blur(6px);
+    background: linear-gradient(135deg, rgba(30,39,73,0.85), rgba(21,27,61,0.85));
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .menu { display: flex; gap: 10px; padding: 8px; border-radius: 999px; border: 1px solid var(--border); background: rgba(30,39,73,0.45);}
+  .menu a {
+    text-decoration: none; color: var(--text-secondary);
+    padding: 10px 14px; border-radius: 999px; font-weight: 800;
+    border: 1px solid transparent;
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+    transition: .2s;
+    display:grid; grid-template-rows:auto auto; justify-items:center; min-width:160px;
+  }
+  .menu a .tab-title { font-weight: 900; line-height: 1.1;}
+  .menu a .tab-sub { font-size:.75rem; color: var(--text-muted); line-height:1;}
+  .menu a:hover { color: var(--text-primary); transform: translateY(-1px); border-color: rgba(99,102,241,.4);}
+  .menu a.active {
+    color: var(--text-primary);
+    background: linear-gradient(135deg, rgba(99,102,241,0.22), rgba(139,92,246,0.22));
+    border-color: rgba(99,102,241,0.6);
+    box-shadow: inset 0 0 0 1px rgba(99,102,241,0.25);
+  }
+  .wrap { max-width: 1100px; margin: 24px auto 80px; padding: 0 16px; }
+
+  /* Page hero */
+  .page-hero {
+    max-width: 980px;
+    margin: 18px auto;
+    display:flex; gap:14px; align-items:center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 22px;
+    border-radius: 24px;
+    background: radial-gradient(900px 600px at 15% 10%, rgba(99,102,241,0.12), transparent 40%),
+                radial-gradient(700px 500px at 85% 80%, rgba(139,92,246,0.12), transparent 40%),
+                linear-gradient(135deg, rgba(17,24,39,0.7), rgba(30,41,59,0.7));
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(148,163,184,0.08);
+  }
+  .page-hero h2 { font-size: 2rem; margin:0; }
+  .muted { color: var(--text-muted); }
+
+  /* Accordion */
+  .accordion { display: grid; gap: 16px; }
+  .accordion.spread { gap: 22px; margin: 18px auto 24px; max-width: 1100px; }
+  .acc-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+  }
+  .acc-header {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 22px; cursor: pointer; border: none; background: transparent; color: var(--text-primary);
+    background: linear-gradient(135deg, rgba(99,102,241,0.12), transparent);
+    font-weight: 900; text-align: left;
+  }
+  .acc-left { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+  .acc-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center; font-size: 1.3rem;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    box-shadow: 0 10px 24px rgba(99,102,241,0.35);
+  }
+  .acc-texts .acc-title { display: block; font-size: 1.15rem; font-weight: 900; letter-spacing: .2px; }
+  .acc-texts .acc-sub { font-size: .9rem; color: var(--text-muted); margin-top: 2px; }
+  .acc-chevron { color: #a5b4fc; transition: transform .25s ease; font-weight: 900; }
+  .acc-section.open .acc-chevron { transform: rotate(180deg); }
+  .acc-content { background: rgba(10, 14, 39, 0.3); }
+  .acc-body { padding: 18px 22px; color: var(--text-secondary); }
+
+  /* Floating action buttons */
+  .fab-wrap {
+    position: fixed; right: 22px; bottom: 22px; z-index: 1200;
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+  }
+  .pill-btn {
+    padding: 12px 16px; border-radius: 999px; font-weight: 900; font-size: .95rem;
+    color: #e0e7ff; border: 1px solid rgba(99,102,241,0.6);
+    background: linear-gradient(135deg, rgba(99,102,241,0.22), rgba(139,92,246,0.22));
+    box-shadow: 0 10px 30px rgba(99,102,241,0.25);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+  }
+  .pill-btn.ghost {
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+    border-color: rgba(99,102,241,0.35);
+  }
+  .pill-btn:hover { transform: translateY(-1px); }
+
+  /* Tables */
+  table { width:100%; border-collapse: collapse; background: #fff; color: #0f172a; border-radius: 12px; overflow: hidden; }
+  th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; vertical-align: top; }
+  thead th { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
+
+  /* Colored cards for scope & grids */
+  .grid-2x2 { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+  .quad { border-radius:16px; padding:18px; border:2px solid rgba(15,23,42,.25); box-shadow:0 8px 20px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.08); color:#0f172a; }
+  .q-manage { background:#c7f3b2; } .q-satisfy { background:#ffc078; } .q-informed { background:#c7b8ff; } .q-monitor { background:#ffa5a0; }
+  .quad h4{ margin:0 0 10px; } .quad hr{ border:none; border-top:2px solid rgba(15,23,42,.25); margin:10px 0 14px; }
+
+  .hide { display:none; }
+
+  /* Methodology diagram (screenshot style) */
+  .sprint-row {
+    display:flex; gap:18px; justify-content:space-between; align-items:flex-end;
+    padding-bottom:14px; border-bottom:3px solid #cbd5e1; margin-bottom:18px;
+  }
+  .sprint {
+    flex:1; min-width:160px; text-align:center;
+  }
+  .sprint .kicker { font-size:.72rem; color:#94a3b8; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+  .sprint .title { font-size:1.6rem; font-weight:900; line-height:1.05; margin-top:2px; }
+  .sprint.plan .title { color:#6366f1; }
+  .sprint.build .title { color:#f59e0b; }
+  .sprint.test .title { color:#ef4444; }
+  .sprint.deploy .title { color:#10b981; }
+  .sprint .sub { font-size:.9rem; color:#94a3b8; margin-top:2px; }
+
+  .phase-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  @media (max-width: 980px){ .phase-grid { grid-template-columns:repeat(2,1fr);} }
+  @media (max-width: 560px){ .phase-grid { grid-template-columns:1fr;} }
+
+  .phase-card {
+    background:#eef2ff; border:3px solid #a5b4fc; color:#0f172a;
+    border-radius:18px; padding:16px; box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  }
+  .phase-card .ph-title { font-weight:900; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .phase-card ul { margin:0 0 12px 0; }
+  .phase-card .pill {
+    display:inline-block; padding:10px 14px; border-radius:12px; background:white;
+    font-weight:800; color:#64748b; border:1.5px solid #e2e8f0;
+  }
+  .phase-card.build { background:#fff7ed; border-color:#fdba74; }
+  .phase-card.test { background:#fee2e2; border-color:#fda4af; }
+  .phase-card.deploy { background:#ecfdf5; border-color:#86efac; }
+  .phase-card.deploy .pill { color:#16a34a; border-color:#a7f3d0; }
+
+  .pdcabox {
+    border:2px solid #e2e8f0; background:linear-gradient(0deg, rgba(255,255,255,.75), rgba(255,255,255,.9));
+    border-radius:18px; padding:16px; margin-top:18px;
+  }
+  .pdcabox h4 { margin:0 0 12px 0; color:#0f172a; display:flex; align-items:center; gap:8px; }
+  .pdcaflow { display:flex; flex-wrap:wrap; align-items:center; gap:22px; justify-content:center; }
+  .pdcastep {
+    display:flex; flex-direction:column; align-items:center; gap:8px; min-width:88px;
+  }
+  .pdcacircle {
+    width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 10px 20px rgba(0,0,0,.15); font-size:1.25rem; color:white;
+  }
+  .pdcacircle.plan { background:#7c3aed; }
+  .pdcacircle.do { background:#f59e0b; }
+  .pdcacircle.check { background:#ef4444; }
+  .pdcacircle.act { background:#10b981; }
+  .arrow { color:#94a3b8; font-weight:900; }
+
+  /* Project Tool (screenshot-style) */
+  .tool-panel {
+    background: linear-gradient(180deg, rgba(17,24,39,.65), rgba(30,41,59,.75));
+    border: 1px solid rgba(148,163,184,.18);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .tool-hero {
+    display:flex; align-items:center; gap:16px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08));
+  }
+  .tool-hero-icon {
+    width:56px; height:56px; border-radius:14px; display:grid; place-items:center; font-size:1.65rem;
+    background: linear-gradient(135deg, #ef4444, #8b5cf6);
+    box-shadow: 0 10px 24px rgba(99,102,241,.35);
+  }
+  .tool-hero h3 { margin:0; font-size:1.8rem; }
+  .tool-hero p { margin:.15rem 0 0 0; color:#cbd5e1; }
+
+  .tool-body { padding: 18px; }
+  .shots { display:flex; gap:20px; flex-wrap:wrap; justify-content:space-between; }
+  .shot {
+    flex:1; min-width:260px; display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .shot-frame {
+    width:100%; aspect-ratio: 16 / 9;
+    background:#0b1225;
+    border-radius:16px;
+    border: 1px solid rgba(148,163,184,.25);
+    box-shadow: 0 20px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05);
+    overflow:hidden;
+    display:grid; place-items:center;
+  }
+  .shot-frame img { width:100%; height:100%; object-fit:cover; display:block; }
+  .shot-caption { font-size:.85rem; color:#cbd5e1; text-align:center; }
+</style>
+</head>
+<body>
+<nav class="top-nav">
+<div class="menu">
+<a href="#charter" id="tab-charter"><span class="tab-title">📜 Project Charter</span><span class="tab-sub"></span></a>
+<a href="#status" id="tab-status"><span class="tab-title">📊 Status Report</span><span class="tab-sub"></span></a>
+<a href="#closure" id="tab-closure"><span class="tab-title">✅ Project Closure Document</span><span class="tab-sub"></span></a>
+<a href="#star" id="tab-star"><span class="tab-title">⭐ STAR Stories</span>
+<a href="#interviews" id="tab-interviews"><span class="tab-title">🗣️ Stakeholder Interviews</span><span class="tab-sub"></span></a>
+</a></div>
+</nav>
+<!-- Floating expand/collapse -->
+<div class="fab-wrap">
+<button class="pill-btn" onclick="accordionExpandAll()">➕ Expand All</button>
+<button class="pill-btn ghost" onclick="accordionCollapseAll()">➖ Collapse All</button>
+</div>
+<!-- CHARTER PAGE -->
+<section class="wrap page" id="page-charter">
+<div class="page-hero"><div style="font-size:1.6rem">📜</div><div><h2>Project Charter</h2></div></div>
+<div class="accordion spread" id="charter-accordion">
+<!-- Student Badge -->
+<section class="acc-section">
+<button aria-expanded="true" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">👤</div>
+<div class="acc-texts">
+<span class="acc-title">Student</span>
+<span class="acc-sub">Identity &amp; term</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content">
+<div class="acc-body">
+<div style="display:inline-flex;align-items:center;gap:1rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);padding:1rem 1.5rem;border-radius:16px;">
+<div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent-success),#059669)">👤</div>
+<div>
+<div style="font-weight:800;font-size:1.05rem">Berenice Fuentes</div>
+<div style="color:var(--text-muted);font-size:.9rem">Fall Semester 2025</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Title & Description -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📋</div>
+<div class="acc-texts">
+<span class="acc-title">Project Title &amp; Description</span>
+<span class="acc-sub">Project goal and overview</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden=""><div class="acc-body">
+<h3>Project Title: Personal Cybersecurity Awareness Guide</h3>
+<p>This project will create a clear and accessible cybersecurity guide that teaches everyday internet users how to protect themselves from common online threats such as phishing, weak passwords, and unsafe browsing. The guide will provide step-by-step tips, real-world examples, and best practices to promote safer digital habits. It will benefit students, professionals, and the general public by increasing awareness and reducing the risk of cyberattacks.</p>
+</div></div>
+</section>
+<!-- Section: Vision / Mission -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🎯</div>
+<div class="acc-texts">
+<span class="acc-title">Vision, Mission &amp; Strategy Alignment</span>
+<span class="acc-sub">How mission maps to goal</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden=""><div class="acc-body">
+<h4>Mission Connection:</h4>
+<p>This project supports my mission of helping others stay safe and confident in the digital world. It reflects my values of education, security, and empowerment by providing people with practical tools to protect themselves online.</p>
+<h4>Vision Alignment:</h4>
+<p>Completing this project moves me closer to my long-term vision of working in the cybersecurity field, where I can combine technical knowledge with communication skills to educate and protect communities. It demonstrates my ability to translate complex cybersecurity concepts into easy-to-understand guidance.</p>
+<h4>Strategic Goal Support:</h4>
+<p>This project advances my strategic goal of building a strong foundation in cybersecurity knowledge while also improving my project management and communication skills. It fits into my long-term vision of working in the cybersecurity field, where I can combine technical knowledge with communication skills to educate and protect communities.</p>
+</div></div>
+</section>
+<!-- Section: Business Case -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">💼</div>
+<div class="acc-texts">
+<span class="acc-title">Business Case &amp; Justification</span>
+<span class="acc-sub">Why this project matters</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden=""><div class="acc-body">
+<h4>Professional Value:</h4>
+<p>Completing this project moves me closer to my long-term goal of working in cybersecurity. It demonstrates the ability to translate complex technical concepts into simple, actionable guidance—a valuable skill for roles in cybersecurity awareness, education, and consulting. It also strengthens my professional capabilities in research, content development, and project management.</p>
+<h4>Personal Value:</h4>
+<p>On a personal level, this project increases my awareness of online safety and helps me apply protective habits in my daily life. It encourages responsible technology use and builds my confidence in navigating digital platforms securely. Creating this guide also gives me a sense of purpose, knowing that the resource I produce can help others protect their personal information and make safer online decisions.</p>
+<h4>Learning Outcomes:</h4>
+<p>Through this project, I expect to gain a deeper understanding of cybersecurity concepts and the ability to explain them in a way that is clear and engaging for a general audience. I will strengthen my research, writing, and design skills, as well as learn to manage a project from planning to completion. By the end of the semester, I will have produced a professional-quality guide that demonstrates both my knowledge and my ability to apply project management principles effectively.</p>
+</div></div>
+</section>
+<!-- Section: Scope cards -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🔍</div>
+<div class="acc-texts">
+<span class="acc-title">High-Level Scope</span>
+<span class="acc-sub">In / Out / Roadmap</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden=""><div class="acc-body">
+<div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
+<div class="quad q-manage">
+<h4>✅ In Scope for Semester Project</h4><hr/>
+<ul>
+<li>Research and explain safe browsing habits, including recognizing secure websites, avoiding malicious links, and understanding privacy settings.</li>
+<li>Identify common signs of phishing emails and messages, and provide clear steps for verifying legitimate sources.</li>
+<li>Emphasize the importance of creating strong, unique passwords and introduce methods for safely managing them (e.g., password managers).</li>
+<li>Write, design, and format the Personal Cybersecurity Awareness Guide into a clear and visually engaging document.</li>
+</ul>
+</div>
+<div class="quad q-informed">
+<h4>🗺️ Roadmap Items (≤6 Months)</h4><hr/>
+<ul>
+<li>Add more advanced interactive learning features (e.g., progress tracking or achievements).</li>
+<li>Expand the content library with new topics such as social media security and data privacy.</li>
+<li>Translate the guide into other languages to reach a wider audience.</li>
+<li>Publish and promote the website on professional platforms (e.g., LinkedIn, GitHub, portfolio site).</li>
+</ul>
+</div>
+<div class="quad q-monitor">
+<h4>❌ Out of Scope</h4><hr/>
+<ul>
+<li>Advanced cybersecurity training or hands-on coding tutorials.</li>
+<li>Implementation of real cybersecurity tools or monitoring systems.</li>
+<li>Large-scale marketing or turning the project into a national awareness campaign.</li>
+</ul>
+</div>
+</div>
+</div></div>
+</section>
+<!-- Section: Stakeholders + Power-Interest 2x2 -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">👥</div>
+<div class="acc-texts">
+<span class="acc-title">Stakeholder Register &amp; Power–Interest Grid</span>
+<span class="acc-sub">Roles, engagement, and quadrant view</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden=""><div class="acc-body">
+<table>
+<thead><tr><th>Stakeholder</th><th>Category</th><th>Role/Interest</th><th>Power</th><th>Interest</th><th>Engagement Strategy</th></tr></thead>
+<tbody><tr>
+<td>Project Sponsor (Professor)</td>
+<td>Internal</td>
+<td>Approves deliverables, evaluates project, and ensures alignment with learning objectives.</td>
+<td>High</td>
+<td>High</td>
+<td>Manage Closely — provide regular updates, reviews, and progress reports.</td>
+</tr>
+<tr>
+<td>Project Manager (Me – Student)</td>
+<td>Internal</td>
+<td>Plans, executes, and delivers all project components.</td>
+<td>High</td>
+<td>High</td>
+<td>Manage Closely — responsible for scope, schedule, and quality.</td>
+</tr>
+<tr>
+<td>End Users (Students, General Public)</td>
+<td>External</td>
+<td>Target audience who will read and benefit from the guide.</td>
+<td>Low</td>
+<td>High</td>
+<td>Keep Informed — gather feedback, simplify content for accessibility.</td>
+</tr>
+<tr>
+<td>Cybersecurity Expert / Consultant</td>
+<td>External</td>
+<td>Reviews content for technical accuracy and relevance.</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Keep Satisfied — consult during research and review stages.</td>
+</tr>
+<tr>
+<td>Social Media Audience</td>
+<td>External</td>
+<td>Passive observers who may benefit from cybersecurity awareness content but aren’t directly involved in the project. Their interest is informational rather than participatory.</td>
+<td>Low</td>
+<td>Medium</td>
+<td>Monitor / Keep Informed — publish updates publicly and observe reactions or engagement metrics. No direct interaction required.</td>
+</tr>
+<tr>
+<td>IT Department or Digital Literacy Program</td>
+<td>Internal</td>
+<td>May support hosting, dissemination, or technical feedback.</td>
+<td>Medium</td>
+<td>Low</td>
+<td>Keep Satisfied — periodic updates and collaboration as needed.</td>
+</tr>
+<tr>
+<td>Community</td>
+<td>External</td>
+<td>Potential audience members for public awareness impact.</td>
+<td>Low</td>
+<td>High</td>
+<td>Keep Informed — distribute final guide and collect community feedback.</td>
+</tr></tbody>
+</table>
+<div style="margin-top: 1.25rem;">
+<h3 style="color:var(--text-primary);margin:0 0 .5rem 0;">Power–Interest Grid</h3>
+<p class="muted">The Power–Interest Grid below shows how stakeholders are grouped based on their level of influence (power) and involvement (interest) in the project.</p>
+<div class="grid-2x2">
+<div class="quad q-manage"><h4>Manage Closely</h4><hr/><ul><li>Project Sponsor (Professor)</li><li>Project Manager (Me – Student)</li></ul></div>
+<div class="quad q-satisfy"><h4>Keep Satisfied</h4><hr/><ul><li>Cybersecurity Expert / Consultant</li><li>IT Department / Digital Literacy Program</li></ul></div>
+<div class="quad q-informed"><h4>Keep Informed</h4><hr/><ul><li>End Users (Students, General Public)</li><li>Family &amp; Friends</li><li>Community</li></ul></div>
+<div class="quad q-monitor"><h4>Monitor</h4><hr/><ul><li>Social Media Audience</li></ul></div>
+</div>
+</div>
+</div></div>
+</section>
+<!-- Section: Deliverables -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📦</div>
+<div class="acc-texts">
+<span class="acc-title">Deliverables Chart</span>
+<span class="acc-sub">Project outputs and definitions</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden=""><div class="acc-body">
+<table>
+<thead><tr><th>Deliverable</th><th>SMART Description</th><th>Definition of Done (DoD)</th></tr></thead>
+<tbody><tr>
+<td>Research &amp; Content Planning</td>
+<td>Complete research on 3 core cybersecurity topics (phishing, passwords, safe browsing) using at least 5 credible sources by Week 2, and create a detailed content outline with section headings and key points.</td>
+<td>Research documented with citations, content outline approved by instructor, key topics identified and organized into logical sections.</td>
+</tr>
+<tr>
+<td>First Draft of Guide</td>
+<td>Write a complete first draft of the cybersecurity guide (minimum 8-10 pages) covering all planned topics with examples and explanations by Week 4.</td>
+<td>All sections written with clear explanations, at least 2 real-world examples per topic included, draft submitted to instructor for initial feedback.</td>
+</tr>
+<tr>
+<td>Visual Design &amp; Layout</td>
+<td>Design and format the guide using Canva or Google Docs by Week 5, incorporating at least 5 infographics, consistent branding, and accessible color scheme (WCAG AA compliant).</td>
+<td>Guide is visually appealing, all graphics created/sourced, formatting is consistent throughout, accessibility checklist completed.</td>
+</tr>
+<tr>
+<td>Peer Review &amp; Usability Testing</td>
+<td>Conduct usability testing with 3-5 peers and family members by Week 6, collecting feedback on clarity, readability, and usefulness using a structured feedback form.</td>
+<td>Feedback collected from minimum 3 testers, feedback form completed, list of improvement areas documented with priority rankings.</td>
+</tr>
+<tr>
+<td>Technical Review &amp; Validation</td>
+<td>Have content reviewed by IT Club member or cybersecurity expert by Week 6 to ensure technical accuracy of all security recommendations and best practices.</td>
+<td>Technical reviewer completes review checklist, all inaccuracies corrected, expert sign-off or approval received.</td>
+</tr>
+<tr>
+<td>Final Polished Guide (PDF/Digital Format)</td>
+<td>Complete the final version of the cybersecurity awareness guide incorporating all feedback by Week 7, exported as a professional PDF with working hyperlinks and table of contents.</td>
+<td>All feedback implemented, guide is error-free (spelling/grammar check completed), PDF is professionally formatted and accessible, file size optimized for sharing.</td>
+</tr>
+<tr>
+<td>Project Reflection &amp; Presentation</td>
+<td>Create a 5-minute presentation summarizing the project process, lessons learned, and key takeaways by Week 7, along with a 2-page written reflection.</td>
+<td>Presentation slides completed, reflection document addresses challenges and learnings, presented to class or submitted to instructor.</td>
+</tr>
+<tr>
+<td>Distribution &amp; Impact Report</td>
+<td>Share the guide with at least 10 people (classmates, community center, social media) by Week 8 and collect feedback on its usefulness and impact.</td>
+<td>Guide distributed through 2+ channels, feedback collected from at least 5 recipients, summary report of impact created.</td>
+</tr></tbody>
+</table>
+</div></div>
+</section>
+<!-- Section: Budget -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">💵</div>
+<div class="acc-texts">
+<span class="acc-title">Budget Estimate</span>
+<span class="acc-sub">Minimal-cost plan with optional add-ons</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p>The <em>Personal Cybersecurity Awareness Guide</em> can be completed at near-zero cost using free tools. The items below reflect a frugal baseline and a few optional enhancements.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Purpose / Description</th>
+<th>Estimated Cost (USD)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Design Tools (Canva / PowerPoint)</td>
+<td>Create infographics, layout, and visuals for the guide.</td>
+<td>$0</td>
+<td>Use free tiers; no paid upgrade required.</td>
+</tr>
+<tr>
+<td>Document Tools (Google Docs / Word)</td>
+<td>Authoring, editing, and formatting the guide content.</td>
+<td>$0</td>
+<td>Free with school account or existing license.</td>
+</tr>
+<tr>
+<td>Printing (Optional)</td>
+<td>Limited hard copies for showcase or submission.</td>
+<td>$20</td>
+<td>Skip to keep the budget at $0.</td>
+</tr>
+<tr>
+<td>Presentation Materials</td>
+<td>Simple handouts or poster for awareness session.</td>
+<td>$10</td>
+<td>Optional; can be fully digital.</td>
+</tr>
+<tr>
+<td>Miscellaneous (Storage/Backups)</td>
+<td>USB drive or cloud storage for version backups.</td>
+<td>$5</td>
+<td>Often covered by free cloud quotas.</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<th>Total Estimated Budget</th>
+<th>Minimal-cost project with optional print assets</th>
+<th>$35</th>
+<th></th>
+</tr>
+</tfoot>
+</table>
+<p style="margin-top: 1rem;"><strong>Cost-saving tip:</strong> Stay fully digital (no printing) and use free tool tiers to keep the project at <strong>$0</strong>.</p>
+</div>
+</div>
+</section>
+<!-- Section: Methodology -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🔄</div>
+<div class="acc-texts">
+<span class="acc-title">Project Methodology</span>
+<span class="acc-sub">Hybrid (Waterfall + Agile)</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<h4>Project Methodology Explanation:</h4>
+<p>This project uses a <strong>Hybrid methodology</strong>: Waterfall is applied for structured planning and research, while Agile supports iterative design and stakeholder feedback. This balance ensures both organization and flexibility throughout the development of the <em>Personal Cybersecurity Awareness Guide</em>.</p>
+<h4>Project Methodology Diagram: The diagram below shows the iterative sprint-based approach with continuous improvement cycles:</h4>
+<div style="background:#fff;border-radius:16px;padding:1rem;border:2px solid #e2e8f0;">
+<div class="sprint-row">
+<div class="sprint plan">
+<div class="kicker">Sprint 1-2</div>
+<div class="title">Plan</div>
+<div class="sub">Weeks 2–3</div>
+</div>
+<div class="sprint build">
+<div class="kicker">Sprint 3-4</div>
+<div class="title">Build</div>
+<div class="sub">Weeks 4–5</div>
+</div>
+<div class="sprint test">
+<div class="kicker">Sprint 5-6</div>
+<div class="title">Test</div>
+<div class="sub">Weeks 6–7</div>
+</div>
+<div class="sprint deploy">
+<div class="kicker">Final Sprint</div>
+<div class="title">Deploy</div>
+<div class="sub">Weeks 8–10</div>
+</div>
+</div>
+<div class="phase-grid">
+<div class="phase-card">
+<h4 class="ph-title">🗒️ Planning Phase</h4>
+<ul>
+<li>Define scope</li>
+<li>Research topics</li>
+<li>Create outline</li>
+<li>Set milestones</li>
+</ul>
+<span class="pill">→ Review</span>
+</div>
+<div class="phase-card build">
+<h4 class="ph-title">🔧 Build Phase</h4>
+<ul>
+<li>Write content</li>
+<li>Design layout</li>
+<li>Create visuals</li>
+<li>Format guide</li>
+</ul>
+<span class="pill">→ Review</span>
+</div>
+<div class="phase-card test">
+<h4 class="ph-title">🧪 Testing Phase</h4>
+<ul>
+<li>Peer review</li>
+<li>Usability test</li>
+<li>Tech validation</li>
+<li>Revise content</li>
+</ul>
+<span class="pill">→ Review</span>
+</div>
+<div class="phase-card deploy">
+<h4 class="ph-title">🚀 Deploy Phase</h4>
+<ul>
+<li>Final polish</li>
+<li>Export PDF</li>
+<li>Present work</li>
+<li>Submit final</li>
+</ul>
+<span class="pill">✓ Complete</span>
+</div>
+</div>
+<div class="pdcabox">
+<h4>⚙️ Continuous Feedback &amp; Iteration Loop</h4>
+<div class="pdcaflow">
+<div class="pdcastep">
+<div class="pdcacircle plan">📝</div>
+<div>Plan</div>
+</div>
+<div class="arrow">→</div>
+<div class="pdcastep">
+<div class="pdcacircle do">⚙️</div>
+<div>Do</div>
+</div>
+<div class="arrow">→</div>
+<div class="pdcastep">
+<div class="pdcacircle check">✔️</div>
+<div>Check</div>
+</div>
+<div class="arrow">→</div>
+<div class="pdcastep">
+<div class="pdcacircle act">↻</div>
+<div>Act</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Project Tool -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🧰</div>
+<div class="acc-texts">
+<span class="acc-title">Project Tool</span>
+<span class="acc-sub">Microsoft Planner – task tracking and scheduling</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<div class="tool-panel">
+<div class="tool-hero">
+<div class="tool-hero-icon">🧰</div>
+<div>
+<h3>Project Tool</h3>
+<p>Microsoft Planner — task tracking and scheduling</p>
+</div>
+</div>
+<div class="tool-body">
+<h3>Project Tool Selection Explanation:</h3>
+<p>I chose <strong>Microsoft Planner</strong> to organize my project. It helps me track tasks, set deadlines, and see all my work in one place. It also makes it easy to adjust tasks if needed.</p>
+<h3>Project Tool Screenshots:</h3>
+<div class="shots">
+<div class="shot">
+<div class="shot-frame"><img alt="Board View" src="Board.png"/></div>
+<div class="shot-caption">Board View</div>
+</div>
+<div class="shot">
+<div class="shot-frame"><img alt="Grid View" src="Grid.png"/></div>
+<div class="shot-caption">Grid View</div>
+</div>
+<div class="shot">
+<div class="shot-frame"><img alt="Chart View" src="charts.png"/></div>
+<div class="shot-caption">Chart View</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</section>
+<!-- STATUS/CLOSURE/STAR/INTERVIEWS placeholders retain tabs and style -->
+<section class="wrap page hide" id="page-status"><div class="page-hero"><div style="font-size:1.6rem">📊</div><div><h2>Status Report</h2><p class="muted"></p></div></div>
+<div class="card">
+<div class="body">
+<table class="weekly-status-table" style="width:100%;border-collapse:collapse;margin-top:1rem;background:white;">
+<thead>
+<tr>
+<th>Date Range</th>
+<th>Project Health</th>
+<th>Executive Summary</th>
+<th>Accomplishments</th>
+<th>Plan for Next Week</th>
+<th>Upcoming Milestones</th>
+<th>Issues &amp; Risks / Mitigations</th>
+<th>Changes Since Last Report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Week 14</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>This week’s focus was on outreach and practical application of the Personal Cybersecurity Awareness Guide. I identified key groups who can benefit from the guide.</td>
+<td><ul><li>Outlined outreach plan</li><li>Identified community groups and contacts</li><li>Drafted outreach messages</li></ul></td>
+<td><ul><li>Initiate outreach to identified groups</li><li>Collect feedback from first recipients</li><li>Track engagement metrics</li></ul></td>
+<td><ul><li>Outreach Launch — Next Week</li><li>Impact Feedback Summary — 2 Weeks</li></ul></td>
+<td>—</td>
+<td>Added outreach focus and beneficiaries list.</td>
+</tr>
+<tr>
+<td><strong>Week 13</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>Updated the Week 13 status report and refined the Personal Cybersecurity Awareness Guide to improve readability, formatting, and overall design consistency. The project continues to progress smoothly with all main deliverables nearing completion.</td>
+<td><ul><li>Added Week 13 status report to project website</li><li>Reviewed and refined guide content</li><li>Improved visual layout and formatting</li><li>Verified navigation links and sections</li></ul></td>
+<td><ul><li>Finalize remaining edits to the guide</li><li>Complete closure documentation</li><li>Confirm all project components are aligned</li><li>Prepare final deliverables for submission</li></ul></td>
+<td><ul><li>Closure Website Final URL — Dec 3 (ON TRACK)</li></ul></td>
+<td>No major issues this week.</td>
+<td>Refined guide content; added Week 13 report; verified links.</td>
+</tr>
+<tr><td><strong>Week 12</strong></td><td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td><td>Created guide cover page, table of contents, and introduction section with cybersecurity statistics. Completed Chapter 1: Understanding Phishing… Visual identity established, first infographic designed. Updated stakeholder register to focus on family/community reps.</td><td><ul><li>Cover &amp; TOC created</li><li>Intro with current statistics</li><li>Chapter 1: Phishing completed</li><li>Accessible visual identity + infographic</li><li>Stakeholder outreach updated (exclude classmates)</li></ul></td><td><ul><li>Draft Chapter 2 (Passwords)</li><li>Draft Chapter 3 (Safe Browsing)</li><li>Create more infographics (5+ total)</li><li>Develop 10-question quiz</li><li>Recruit 3–5 non-classmate testers</li><li>Schedule technical review</li></ul></td><td><ul><li>First Draft — Wk 4</li><li>Visual Design — Wk 5</li><li>Interactive Quiz — Wk 6</li><li>User Testing — Wk 6</li><li>Final Guide — Wk 7</li></ul></td><td>—</td><td>Outreach now excludes classmates; focuses on new participants.</td></tr>
+<tr>
+<td><strong>Week 11</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>Finalized comprehensive Project Charter; began developing the PDF guide and design elements; updated outreach to non-classmate testers.</td>
+<td><ul><li>All 10 charter sections refined</li><li>SMART deliverables and DoD</li><li>Status table structure</li><li>Guide cover and intro written</li><li>Chapter 1: Phishing content</li><li>Initial visual elements</li><li>Updated tester outreach</li></ul></td>
+<td><ul><li>Complete Chapter 2 &amp; 3</li><li>Create remaining infographics</li><li>Develop quiz</li><li>Identify 3–5 testers</li></ul></td>
+<td><ul><li>Research &amp; Planning — Wk 2 (Complete)</li><li>First Draft — Wk 4</li><li>Visual Design — Wk 5</li><li>Quiz — Wk 6</li><li>User Testing — Wk 6</li><li>Final Guide — Wk 7</li></ul></td>
+<td>—</td><td>Focus on non-classmate testers for target audience fit.</td>
+</tr>
+<tr>
+<td><strong>Week 10</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>Final guide completed and submitted. All feedback implemented; PDF exported; presentation prepared.</td>
+<td><ul><li>All revisions applied</li><li>Proofread</li><li>Exported PDF with TOC</li><li>5-minute presentation</li><li>2-page reflection</li></ul></td>
+<td><ul><li>Present to class</li><li>Submit deliverables</li><li>Share with community</li></ul></td>
+<td><ul><li>Final Presentation — Wk 8 (COMPLETE)</li><li>Submission — Wk 8 (COMPLETE)</li></ul></td>
+<td>—</td><td>—</td>
+</tr>
+<tr>
+<td><strong>Week 9</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>Peer review and usability testing completed successfully. All feedback documented and prioritized.</td>
+<td><ul><li>Usability tests with 4 participants</li><li>Feedback forms collected</li><li>Fixed mobile responsiveness</li><li>IT Club technical review completed</li></ul></td>
+<td><ul><li>Implement priority feedback</li><li>Final proofreading</li><li>Export PDF</li></ul></td>
+<td><ul><li>Final Guide — Wk 7</li><li>Reflection — Wk 7</li><li>Presentation — Wk 8</li></ul></td>
+<td>—</td><td>—</td>
+</tr>
+<tr>
+<td><strong>Week 8</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#fed7aa;color:#92400e;border:1.5px solid #f59e0b;">🟡 AT RISK</span></td>
+<td>Visual design completed with infographics and formatting. Some accessibility concerns identified that need addressing before peer review.</td>
+<td><ul><li>5+ infographics created</li><li>Branding applied</li><li>WCAG AA contrast compliance</li><li>Accessibility checklist completed</li></ul></td>
+<td><ul><li>Fix accessibility issues</li><li>Peer review with 3+ people</li><li>Collect structured feedback</li></ul></td>
+<td><ul><li>Peer Review — Wk 6 (AT RISK)</li><li>Technical Review — Wk 6 (AT RISK)</li><li>Final Guide — Wk 7 (AT RISK)</li></ul></td>
+<td><strong>MINOR</strong> — Some mobile formatting issues. <em>Mitigation:</em> multi-device testing and responsive tweaks.</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Week 7</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>First draft of guide content completed. Three main sections written with examples.</td>
+<td><ul><li>Phishing awareness section</li><li>Password management section</li><li>Safe browsing section</li><li>2+ examples per topic</li></ul></td>
+<td><ul><li>Begin visual layout</li><li>Create infographics</li><li>Consistent formatting</li></ul></td>
+<td><ul><li>Visual Design — Wk 5</li><li>Peer Review — Wk 6</li><li>Final Guide — Wk 7</li></ul></td>
+<td>—</td><td>—</td>
+</tr>
+<tr>
+<td><strong>Week 6</strong></td>
+<td><span style="display:inline-block;padding:.35rem .75rem;border-radius:16px;background:#d1fae5;color:#065f46;border:1.5px solid #10b981;">🟢 ON TRACK</span></td>
+<td>Project kickoff completed successfully. Research underway with planning established.</td>
+<td><ul><li>Best-practice research</li><li>Detailed outline</li><li>Key topics selected</li></ul></td>
+<td><ul><li>Write phishing draft</li><li>Create visual mockups</li><li>Gather examples</li></ul></td>
+<td><ul><li>First Draft — Wk 4</li><li>Visual Design — Wk 5</li><li>Peer Review — Wk 6</li></ul></td>
+<td>—</td><td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="wrap page hide" id="page-closure">
+<div class="page-hero">
+<div style="font-size:1.6rem">✅</div>
+<div>
+<h2>Project Closure Document</h2>
+<p class="muted"></p>
+</div>
+</div>
+<div class="accordion spread">
+<!-- 1. Project Information -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📘</div>
+<div class="acc-texts">
+<span class="acc-title">1. Project Information</span>
+<span class="acc-sub">Overview &amp; closure summary</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Project Title:</strong> Personal Cybersecurity Awareness Guide</p>
+<p><strong>Project Manager:</strong> Berenice Fuentes</p>
+<p><strong>Project Description:</strong> The Personal Cybersecurity Awareness Guide is a semester-long project designed to educate everyday internet users on how to stay safe online. The guide covers phishing awareness, password security, and safe browsing practices. It delivers a visually appealing, easy-to-read resource supported by research, infographics, and real-world examples. The project involved drafting, designing, testing with users, and finalizing a polished cybersecurity guide.</p>
+<p><strong>Project Closure Type:</strong> ✔ Formal Closure – All deliverables completed and accepted</p>
+<p><strong>Closing Summary:</strong> The project successfully met all of its original goals. All deliverables—including research, drafting, design, usability testing, and final PDF—were completed on time. Key successes included strong stakeholder engagement, effective peer feedback collection, and polished visual design. Challenges included time pressure during the design and accessibility phase, plus the need to troubleshoot formatting issues. Overall, the project achieved high success, delivering a functional, educational cybersecurity resource ready for distribution: <strong>high success</strong>.</p>
+</div>
+</div>
+</section>
+<!-- 2. Deliverables Summary -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📦</div>
+<div class="acc-texts">
+<span class="acc-title">2. Deliverables Summary</span>
+<span class="acc-sub">Status of all major outputs</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<table>
+<thead>
+<tr>
+<th>Deliverable</th>
+<th>Definition of Done</th>
+<th>Actual Progress</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Research &amp; Content Planning</td><td>Research 3 key topics, use 5+ credible sources, outline completed</td><td>Research fully completed, outline approved</td><td>✅ Completed</td></tr>
+<tr><td>First Draft of Guide</td><td>8–10 pages, include examples</td><td>Full draft completed, three main chapters written</td><td>
+✅ Completed</td></tr>
+<tr><td>Visual Design &amp; Layout</td><td>5+ infographics, WCAG AA colors, consistent layout</td><td>All infographics created; final design polished</td><td>✅ Completed</td></tr>
+<tr><td>Peer Review &amp; Usability Testing</td><td>3–5 testers, feedback forms collected</td><td>4 usability testers completed; issues documented</td><td>✅ Completed</td></tr>
+<tr><td>Technical Review</td><td>Cybersecurity expert or IT Club validation</td><td>IT Club member reviewed content; accuracy verified</td><td>✅ Completed</td></tr>
+<tr><td>Final Polished Guide (PDF)</td><td>All feedback applied, error-free PDF<td><td>Final PDF completed, accessible, exported</td><td>✅ Completed</td></td></td></tr>
+<tr><td>Reflection &amp; Presentation</td><td>5-minute presentation + 2-page reflection</td><td>Completed and presented</td><td>✅ Completed</td></tr>
+<tr><td>Distribution &amp; Impact</td><td>Share with 10+ people, gather feedback</td><td>Guide shared with community groups and individuals</td><td>✅ Completed</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- 3. Change Log -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🔄</div>
+<div class="acc-texts">
+<span class="acc-title">3. Change Log</span>
+<span class="acc-sub">Documented scope changes</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<table>
+<thead><tr><th>No</th><th>Date</th><th>Change</th><th>Reason</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Week 11</td><td>Removed classmates from usability testing group</td><td>To avoid bias and reach the intended external audience</td></tr>
+<tr><td>2</td><td>Week 12</td><td>Added statistics and improved intro section</td><td>To increase relevance and credibility of guide</td></tr>
+<tr><td>3</td><td>Week 13</td><td>Updated full guide layout for readability</td><td>Feedback indicated formatting could be clearer</td></tr>
+<tr><td>4</td><td>Week 13</td><td>Expanded outreach plan</td><td>To meet distribution deliverable requirements</td></tr>
+<tr><td>5</td><td>Week 14</td><td>Added community-focused impact tracking</td><td>To measure real-world usefulness</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- 4. Performance Analysis -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📊</div>
+<div class="acc-texts">
+<span class="acc-title">4. Performance Analysis</span>
+<span class="acc-sub">Budget &amp; schedule performance</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<h4>4.1 Budget Performance</h4>
+<p>The project stayed within the $0–$35 projected budget. No unexpected expenses occurred. All tools used—Google Docs, Canva, cloud storage were free. No paid upgrades were required.</p>
+<h4>4.2 Schedule Performance</h4>
+<p>The project followed the semester schedule successfully. Minor delays occurred during the visual design and accessibility review phase (Week 8), but corrective actions kept the project on track. Overall, deadlines were met and deliverables were submitted on time.</p>
+</div>
+</div>
+</section>
+<!-- 5. Stakeholder Management -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">👥</div>
+<div class="acc-texts">
+<span class="acc-title">5. Stakeholder Management</span>
+<span class="acc-sub">Engagement &amp; communication</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p>Stakeholders included the instructor, end users, cybersecurity reviewers, peers, and community members. Engagement strategies such as regular updates, structured feedback forms, and technical reviews ensured positive involvement. Feedback from peers and IT reviewers was especially valuable for improving clarity and accuracy. Communication remained effective through consistent status updates and transparent progress sharing.</p>
+</div>
+</div>
+</section>
+<!-- 6. Risk Summary -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">⚠️</div>
+<div class="acc-texts">
+<span class="acc-title">6. Risks &amp; Issues</span>
+<span class="acc-sub">What occurred &amp; mitigation</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ul>
+<h4>Risks That Occurred</h4>
+<li>Accessibility issues in visual design (Week 8)
+Mitigation: Revised formatting, improved contrast, corrected mobile responsiveness.</li>
+<li>Time pressure during drafting and design phase
+Mitigation: Adjusted planner tasks, increased prioritization.</li>
+<h4>Unexpected Issues</h4>
+<li>Formatting inconsistencies in mobile version
+Solution: Multiple device tests + layout fixes.</li>
+<h4>Outstanding Risks</h4>
+<li>Ongoing need to maintain content accuracy as cybersecurity threats evolve.</li>
+<li>Future distribution may require technical updates or formatting adaptations.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- 7. What Went Well -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🌟</div>
+<div class="acc-texts">
+<span class="acc-title">7. What Went Well</span>
+<span class="acc-sub">Successes</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ul>
+<li>Strong weekly organization using Microsoft Planner kept tasks clear and manageable.</li>
+<li>Peer usability testing provided actionable insights.</li>
+<li>Visual design skills improved and resulted in a polished final product.</li>
+<li>Strong alignment between goals, deliverables, and executed plan.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- 8. What Didn’t Go Well -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🚧</div>
+<div class="acc-texts">
+<span class="acc-title">8. What Didn’t Go Well</span>
+<span class="acc-sub">Challenges</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ul>
+<li>Time constraints made the visual design phase more stressful than expected.</li>
+<li>Accessibility issues required rework late in the project.</li>
+<li>Usability testing recruitment took longer than planned.</li>
+<li>Balancing multiple class assignments created scheduling pressure.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- 9. What Would You Do Differently -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🔧</div>
+<div class="acc-texts">
+<span class="acc-title">9. What Would You Do Differently?</span>
+<span class="acc-sub">Improvements for future work</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ul>
+<li>Start usability testing earlier to allow more time for revisions.</li>
+<li>Build infographics incrementally instead of all at once.</li>
+<li>Add buffer weeks into the schedule for design revisions.</li>
+<li>Create a standardized template early to prevent formatting issues later.</li>
+<li>Reduce scope in earlier weeks to avoid rushing near the end.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- 10. Lessons Learned -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📚</div>
+<div class="acc-texts">
+<span class="acc-title">10. Lessons Learned Register</span>
+<span class="acc-sub">Key lessons</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<table>
+<thead>
+<tr><th>Date</th><th>Stage</th><th>Problem</th><th>Consequence</th><th>Lesson</th></tr>
+</thead>
+<tbody>
+<tr><td>Week 8</td><td>Execution</td><td>Accessibility issues identified late</td><td>Rework delayed testing</td><td>Integrate accessibility checks from the start</td></tr>
+<tr><td>Week 7</td><td>Execution</td><td>Drafting took longer than expected</td><td>Pressure to finish visuals</td><td>Set more realistic writing time estimates</td></tr>
+<tr><td>Week 9</td><td>Testing</td><td>Mobile formatting problems</td><td>Usability test findings required redesign</td><td>Always test on multiple devices</td></tr>
+<tr><td>Week 11</td><td>Planning</td><td>User testing group unclear</td><td>Needed to redefine target audience</td><td>Define audience criteria early</td></tr>
+<tr><td>Week 12</td><td>Monitoring</td><td>Content felt too plain</td><td>Required adding visuals + examples</td><td>Use visual aids to improve comprehension</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- 11. Key Takeaways -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">💡</div>
+<div class="acc-texts">
+<span class="acc-title">11. Key Takeaways</span>
+<span class="acc-sub">Top insights</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ol>
+<li>Start with a realistic, achievable scope.</li>
+<li>Incorporate accessibility requirements early.</li>
+<li>Schedule recurring task reviews using a planning tool.</li>
+<li>Gather user feedback at multiple stages, not just one.</li>
+<li>Build visual components gradually to avoid time crunch.</li>
+</ol>
+</div>
+</div>
+</section>
+<!-- 12. Formal Sign-Off -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">✒️</div>
+<div class="acc-texts">
+<span class="acc-title">12. Formal Sign-Off</span>
+<span class="acc-sub">Stakeholder approval</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Project Manager:</strong> Berenice Fuentes</p>
+<p><strong>Stakeholder Feedback:</strong>Instructor and peer reviewers expressed satisfaction with the clarity, usability, and design of the guide. Community users reported that the guide improved their understanding of cybersecurity concepts. All deliverables were reviewed and accepted.</p>
+<p><strong>Stakeholder Sign-Off:</strong>Project sponsor verbally and formally approved the final deliverables during the closing review session.</p>
+</div>
+</div>
+</section>
+<!-- 13. Recognition -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🏆</div>
+<div class="acc-texts">
+<span class="acc-title">13. Recognition</span>
+<span class="acc-sub">Acknowledgments</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ul>
+<li><strong>IT Club Reviewer —</strong> for validating technical accuracy</li>
+<li><strong>Peer Testers —</strong> for giving usability feedback</li>
+<li><strong>Community Members —</strong> for participating in outreach</li>
+<li><strong>Instructor — </strong>for guidance, milestones, and evaluation</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- 14. What’s Next -->
+<section class="acc-section">
+<button class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🚀</div>
+<div class="acc-texts">
+<span class="acc-title">14. What’s Next</span>
+<span class="acc-sub">Future roadmap</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<ol>
+<li>Expand the guide into more chapters (e.g., social media safety, device security).</li>
+<li>Convert the guide into an interactive website or mini-course.</li>
+<li>Share the project on LinkedIn/GitHub as part of your cybersecurity portfolio.</li>
+<li>Pursue deeper cybersecurity certifications (e.g., Security+, Google Cybersecurity Cert).</li>
+<li>Apply project management and communication lessons to future academic and career projects.</li>
+</ol>
+</div>
+</div>
+</section>
+</div>
+</section>
+<section class="wrap page hide" id="page-star">
+<div class="page-hero">
+<div style="font-size:1.6rem">⭐</div>
+<div>
+<h2>STAR Stories</h2>
+</div>
+</div>
+<div class="accordion spread" id="star-accordion">
+<!-- Story 1 -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📽️</div>
+<div class="acc-texts">
+<span class="acc-title">Story 1: Handling Scope Changes in Our CIS Project</span>
+<span class="acc-sub">Adjusting our project when new ideas came up</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Source:</strong> Project Presentation</p>
+<p><strong>Title:</strong> Adjusting Our Project When New Ideas Came Up</p>
+<h4>Situation</h4>
+<p>My team was building a small web app for our semester project. After we showed the first version to our group and got feedback, a few teammates suggested adding extra features like filters and a more detailed page layout. These weren’t part of our original plan and would take more time.</p>
+<h4>Task</h4>
+<p>I needed to help the team figure out how these new ideas would affect our timeline and decide which ones we could realistically include.</p>
+<h4>Action</h4>
+<p>I went through each suggested feature and estimated how long it would take based on the code we already had. I shared the estimates with the team and explained how adding everything might cause us to fall behind. We talked it through and decided to focus only on the features that made the biggest improvement and were easiest to finish.</p>
+<h4>Result</h4>
+<p>We ended up keeping just the filter feature for this version and setting the rest aside for “future improvements.” We finished the project on time and still improved the user experience. I learned that not every idea needs to fit into the current version—sometimes you have to prioritize.</p>
+</div>
+</div>
+</section>
+<!-- Story 2 -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">📁</div>
+<div class="acc-texts">
+<span class="acc-title">Story 2: Improving Team Communication</span>
+<span class="acc-sub">Helping our team stay organized and on the same page</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Source:</strong> Project Presentation</p>
+<p><strong>Title:</strong> Helping Our Team Stay Organized and On the Same Page</p>
+<h4>Situation</h4>
+<p>At first, our team communicated in a messy way. Some people texted, others emailed, and files were scattered everywhere. Because of this, some tasks were repeated and some were forgotten.</p>
+<h4>Task</h4>
+<p>I wanted to make our communication easier and help the team avoid confusion.</p>
+<h4>Action</h4>
+<p>I suggested that we choose one main place for messaging and one place for documents. We picked Slack for updates and Google Drive for files. I also made a simple task list so everyone could see what was done and what still needed work. During our weekly team check-ins, I reminded everyone to update the list so we stayed on track.</p>
+<h4>Result</h4>
+<p>Our group became much more organized. People didn’t overlap work anymore, and tasks were easier to track. We hit our deadlines with less stress and finished everything on time. I learned that even basic organization tools make a big difference when working in a group.</p>
+</div>
+</div>
+</section>
+<!-- Story 3 -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🧩</div>
+<div class="acc-texts">
+<span class="acc-title">Story 3: Managing Technical Complexity</span>
+<span class="acc-sub">PMI Principle 2 – Acknowledge and Navigate Complexity</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Source:</strong> PMI Principle 2 – Acknowledge and Navigate Complexity</p>
+<p><strong>Prompt:</strong> Describe a time when you recognized a source of project complexity and took action to address it.</p>
+<h4>Situation</h4>
+<p>In a CIS group project, several parts of our system depended on each other. The backend wasn’t ready, but some teammates wanted to test the frontend anyway. This caused errors and made things confusing.</p>
+<h4>Task</h4>
+<p>I needed to help the team understand the order our tasks should be done in so we didn’t waste time testing things that weren’t ready.</p>
+<h4>Action</h4>
+<p>I made a quick dependency chart that showed which tasks needed to be completed first. It wasn’t complicated,just simple arrows and boxes but it helped everyone visualize the workflow. We used the chart to update our task list and reorder what we were working on.</p>
+<h4>Result</h4>
+<p>We stopped running into so many errors and finished our weekly goals faster. Everyone agreed the chart made things clearer. I learned that even a small visual tool can make a complex project feel more manageable.</p>
+</div>
+</div>
+</section>
+<!-- Story 4 -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🧭</div>
+<div class="acc-texts">
+<span class="acc-title">Story 4: Using Resources Wisely</span>
+<span class="acc-sub">PMI Principle 1 – Demonstrate Stewardship</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Source:</strong> PMI Principle 1 – Demonstrate Stewardship</p>
+<p><strong>Prompt:</strong> Describe a time when you acted responsibly with project resources.</p>
+<h4>Situation</h4>
+<p>Our group had limited time to finish our project because people had different schedules and other assignments. We had to make the most of the time we spent working together.</p>
+<h4>Task</h4>
+<p>I needed to help our team stay focused and avoid wasting time on unclear tasks or repeated work.</p>
+<h4>Action</h4>
+<p>I organized all our open questions and tasks into one shared list so everyone knew what needed to be done. I also made small outlines of what each feature should look like before anyone started coding. This avoided people guessing or spending time building something we didn’t need.</p>
+<h4>Result</h4>
+<p>We used our work sessions more efficiently, and no one built the wrong thing. We finished early enough to test everything properly. I learned that preparing information ahead of time helps the whole team stay productive.</p>
+</div>
+</div>
+</section>
+<!-- Story 5 -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🤝</div>
+<div class="acc-texts">
+<span class="acc-title">Story 5: Resolving a Team Conflict</span>
+<span class="acc-sub">PMI Principle 4 – Build Quality Teams</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Source:</strong> PMI Principle 4 – Build Quality Teams</p>
+<p><strong>Prompt:</strong> Describe a time when you helped resolve a disagreement in a team.</p>
+<h4>Situation</h4>
+<p>In one project, two teammates disagreed about which database tool to use. One preferred MySQL because it was structured, and the other liked MongoDB because it was flexible. The disagreement was slowing us down.</p>
+<h4>Task</h4>
+<p>I wanted to help the team make a choice based on what worked best for the project, not on personal preferences.</p>
+<h4>Action</h4>
+<p>I suggested we compare both tools using simple criteria: how long it would take to learn, how well it fit our data, and how easy it would be to maintain. We filled out the comparison as a group and looked at the results.</p>
+<h4>Result</h4>
+<p>Everyone agreed MySQL fit our project better, and the conflict ended. After that, the team worked together more smoothly. I learned that creating a fair comparison helps settle disagreements without drama.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+<section class="wrap page hide" id="page-interviews"><div class="page-hero"><div style="font-size:1.6rem">🗣️</div><div><h2>Stakeholder Interviews</h2><p class="muted"></p></div></div>
+<div class="accordion spread" id="interview-accordion">
+<!-- Interview: Griselda -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🥗</div>
+<div class="acc-texts">
+<span class="acc-title">Interview: Griselda (Restaurant Manager)</span>
+<span class="acc-sub">Small business perspective on cybersecurity needs</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Name:</strong> Griselda — Manager at Simply Salads</p>
+<p><strong>Date of Meeting:</strong>Dec 5,2025</p>
+<p><strong>Selection Rationale:</strong> As a manager of a small business handling digital orders, vendor emails, and staff scheduling tools, Griselda represents everyday nontechnical users who are often targeted by phishing and password-related risks. Her input is valuable for understanding real-world cybersecurity behaviors in fast-paced workplace environments.</p>
+<h4>Conversation Summary</h4>
+<p>Griselda shared that cybersecurity is not formally discussed in her workplace, yet her team depends heavily on digital tools daily. Phishing attempts often disguised as invoices, schedule updates, or vendor notices appear occasionally, and newer employees sometimes struggle to identify fake messages. She emphasized the need for simple, visual examples to help staff avoid mistakes under time pressure.</p>
+<p>She also explained that employees frequently reuse passwords because remembering many logins is difficult. She found the idea of a guide explaining strong password habits and password managers especially useful. Overall, she felt the cybersecurity awareness guide could help small businesses improve digital safety without requiring technical expertise.</p>
+<h4>Key Insights</h4>
+<ul>
+<li>Small business employees commonly face phishing emails but lack training.</li>
+<li>Short, visual, easy-to-understand cybersecurity tips are the most effective.</li>
+<li>Password reuse is a widespread issue in fast paced workplaces.</li>
+<li>Nontechnical environments need practical guidance, not technical jargon.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Interview: Joel -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">👮</div>
+<div class="acc-texts">
+<span class="acc-title">Interview: Joel (Police Officer)</span>
+<span class="acc-sub">Law enforcement insights on scams &amp; identity theft</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Name:</strong> Joel — Police Officer</p>
+<p><strong>Date of Meeting:</strong>Dec 5,2025</p>
+<p><strong>Selection Rationale:</strong> As a police officer, Joel encounters real cases of online scams, fraud, and identity theft, giving him unique insight into the consequences of poor cybersecurity habits and the tactics criminals use.</p>
+<h4>Conversation Summary</h4>
+<p>Joel explained that a large portion of reports he handles involve phishing scams and fraudulent messages designed to create panic such as fake bank alerts or threats of account suspension. Many victims respond quickly because the messages appear urgent or realistic.</p>
+<p>He also noted that people overshare personal information online, making them easier targets for criminals. He emphasized that strong passwords and two factor authentication prevent many of the incidents he sees.</p>
+<p>Joel strongly supported including real-life scam examples in the guide, saying people often don’t realize how convincing these messages can look.</p>
+<h4>Key Insights</h4>
+<ul>
+<li>Urgency is the #1 psychological trick used by scammers.</li>
+<li>Most victims do not know the signs of phishing or social engineering.</li>
+<li>Personal information shared online contributes to targeted attacks.</li>
+<li>Two factor authentication and strong passwords could prevent many fraud cases.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Interview: Kelly -->
+<section class="acc-section">
+<button aria-expanded="false" class="acc-header">
+<div class="acc-left">
+<div class="acc-icon">🩺</div>
+<div class="acc-texts">
+<span class="acc-title">Interview: Kelly (Registered Nurse)</span>
+<span class="acc-sub">Healthcare perspective on cybersecurity awareness</span>
+</div>
+</div>
+<span class="acc-chevron">⌄</span>
+</button>
+<div class="acc-content" hidden="">
+<div class="acc-body">
+<p><strong>Name:</strong> Kelly — Registered Nurse</p>
+<p><strong>Date of Meeting:</strong>Dec 5,2025</p>
+<p><strong>Selection Rationale:</strong> Healthcare professionals deal with sensitive patient data and rely heavily on digital systems, making cybersecurity especially important. Kelly offers insight into how everyday professionals balance security with a high stress, high speed work environment.</p>
+<h4>Conversation Summary</h4>
+<p>Kelly explained that although hospitals provide cybersecurity training and occasional phishing simulations, many staff members still struggle with identifying suspicious emails especially those that appear to come from supervisors or IT.</p>
+<p>She mentioned that due to constant stress and time pressure, workers sometimes reuse passwords or rush through security steps. She felt your guide’s simple language, examples, and practical steps could benefit people in and out of healthcare.</p>
+<p>She appreciated that the project focuses on daily habits rather than technical skills, saying that’s exactly what many overwhelmed healthcare workers need.</p>
+<h4>Key Insights</h4>
+<ul>
+<li>Healthcare workers remain vulnerable to phishing despite formal training.</li>
+<li>Time pressure leads to shortcuts that weaken security.</li>
+<li>Password fatigue is common many reuse passwords.</li>
+<li>Simple, practical cybersecurity education is more helpful than long lessons.</li>
+</ul>
+</div>
+</div>
+</section>
+</div>
+</section>
+<script>
+  // Tabs
+  function showPage(key) {
+    const pages = ['charter','status','closure','star','interviews'];
+    pages.forEach(p => {
+      const pageEl = document.getElementById('page-' + p);
+      const tabEl = document.getElementById('tab-' + p);
+      if (!pageEl || !tabEl) return;
+      pageEl.classList.toggle('hide', p !== key);
+      tabEl.classList.toggle('active', p === key);
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  function init() {
+    const hash = (location.hash || '#charter').slice(1).toLowerCase();
+    const valid = ['charter','status','closure','star','interviews'];
+    showPage(valid.includes(hash) ? hash : 'charter');
+  }
+  window.addEventListener('hashchange', init);
+  init();
+
+  // Accordion open/close animation
+  document.addEventListener('click', (e) => {
+    const header = e.target.closest('.acc-header');
+    if (!header) return;
+    const section = header.parentElement;
+    const content = section.querySelector('.acc-content');
+    const expanded = header.getAttribute('aria-expanded') === 'true';
+    header.setAttribute('aria-expanded', String(!expanded));
+    section.classList.toggle('open', !expanded);
+    if (!expanded) {
+      content.hidden = false;
+      const endHeight = content.scrollHeight;
+      content.style.height = '0px';
+      content.style.transition = 'height .25s ease';
+      requestAnimationFrame(() => content.style.height = endHeight + 'px');
+      content.addEventListener('transitionend', function handler() {
+        content.style.height = ''; content.style.transition = ''; content.removeEventListener('transitionend', handler);
+      });
+    } else {
+      const startHeight = content.scrollHeight;
+      content.style.height = startHeight + 'px';
+      content.style.transition = 'height .25s ease';
+      requestAnimationFrame(() => content.style.height = '0px');
+      content.addEventListener('transitionend', function handler() {
+        content.hidden = true; content.style.height = ''; content.style.transition = ''; content.removeEventListener('transitionend', handler);
+      });
+    }
+  });
+
+  function accordionExpandAll() {
+    document.querySelectorAll('#charter-accordion .acc-section').forEach(sec => {
+      if (!sec.classList.contains('open')) sec.querySelector('.acc-header')?.click();
+    });
+  }
+  function accordionCollapseAll() {
+    document.querySelectorAll('#charter-accordion .acc-section.open').forEach(sec => {
+      sec.querySelector('.acc-header')?.click();
+    });
+  }
+</script>
+</body>
+</html>
